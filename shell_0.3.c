@@ -9,7 +9,7 @@
 
 void shell_prompt(void)
 {
-printf(":) ");
+printf("simple_shell> ");
 }
 
 void execute_command(char *command, char *args[])
@@ -45,14 +45,6 @@ token = strtok(NULL, " ");
 args[arg_count] = NULL;
 if (arg_count > 0)
 {
-pid_t pid = fork();
-if (pid == -1)
-{
-perror("simple_shell");
-exit(EXIT_FAILURE);
-}
-else if (pid == 0)
-{
 char *command_path = args[0];
 if (access(command_path, F_OK) == -1)
 {
@@ -73,6 +65,14 @@ path_token = strtok(NULL, ":");
 }
 }
 }
+pid_t pid = fork();
+if (pid == -1)
+{
+perror("simple_shell");
+exit(EXIT_FAILURE);
+}
+else if (pid == 0)
+{
 execute_command(command_path, args);
 }
 else
