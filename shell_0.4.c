@@ -21,7 +21,16 @@ exit(EXIT_FAILURE);
 
 int is_builtin_command(char *command)
 {
-return (strcmp(command, "exit") == 0);
+return (strcmp(command, "exit") == 0 || strcmp(command, "env") == 0);
+}
+
+void print_environment(void)
+{
+extern char **environ;
+for (char **env = environ; *env != NULL; env++)
+{
+printf("%s\n", *env);
+}
 }
 
 int main(void)
@@ -56,9 +65,33 @@ if (strcmp(args[0], "exit") == 0)
 {
 exit(0);
 }
+else if (strcmp(args[0], "env") == 0)
+{
+print_environment();
+}
 }
 else
 {
+char *command_path = args[0];
+if (access(command_path, F_OK) == -1)
+{
+char *path = getenv("PATH");
+if (path != NULL)
+{
+char *path_token = strtok(path, ":");
+while (path_token != NULL)
+{
+char full_path[MAX_INPUT_LENGTH];
+snprintf(full_path, sizeof(full_path), "%s/%s", path_token, args[0]);
+if (access(full_path, F_OK) == 0)
+{
+command_path = full_path;
+break;
+}
+path_token = strtok(NULL, ":");
+}
+}
+}
 pid_t pid = fork();
 if (pid == -1)
 {
